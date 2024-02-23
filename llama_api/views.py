@@ -12,17 +12,12 @@ def index(request):
 @csrf_exempt
 @require_POST
 def query(request : HttpRequest):
-    qa: RetrievalQA = request.session.get('qa')
-    print("QA", qa)
-    if qa is None:
-        qa = LlamaApiConfig.qa
-        print("QA is generated")
+    qa = LlamaApiConfig.qa
     data = request.POST
     query = data['query']
     response = qa(query)
 
     result_text = response.get("result", "")
-    # Format the result into a structured JSON object
     formatted_result = {
         "result": result_text,
         "status": "success" if result_text else "error",

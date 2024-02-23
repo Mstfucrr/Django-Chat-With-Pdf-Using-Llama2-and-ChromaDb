@@ -6,8 +6,6 @@ class LlamaApiConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'llama_api'
 
-    # Initialize components here
-
     llm = get_llm()
     documents = pdf_loader()
 
