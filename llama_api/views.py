@@ -1,3 +1,4 @@
+import pickle
 from django.http import HttpRequest, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_GET
@@ -19,21 +20,27 @@ def query(request : HttpRequest):
     data = request.POST
     query = data['query']
     response = qa(query)
-    return JsonResponse({"result : " : response["result"]})
+
+    result_text = response.get("result", "")
+    # Format the result into a structured JSON object
+    formatted_result = {
+        "result": result_text,
+        "status": "success" if result_text else "error",
+        "message": "Query processed successfully" if result_text else "Error processing the query",
+    }
+
+    return JsonResponse(formatted_result)
 
 @require_GET
 def get_docs(request):
-    return JsonResponse({
-        "docs": [
-            {
-                "title": "Query",
-                "description": "Query the model with a question",
-                "method": "POST",
-                "path": "/api/query",
-                "body": {
-                    "query": "string"
-                }
-            }
-        ]
-    })
+    if len(LlamaApiConfig.text_chunks) == 0:
+        return JsonResponse({"message": "No documents found"})
+    js_list = [
+        {
+            "source": text_chunk.metadata['source'],
+            "content": text_chunk.page_content
+        }
+        for text_chunk in LlamaApiConfig.text_chunks
+    ]
+    return JsonResponse({"message": "Success", "data": js_list})
 

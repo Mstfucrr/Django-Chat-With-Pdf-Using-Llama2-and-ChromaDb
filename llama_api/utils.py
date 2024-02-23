@@ -129,4 +129,3 @@ def get_qa(llm, vectordb):
     print("QA loaded")
     return qa
 
-qa = None
